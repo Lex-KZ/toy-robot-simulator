@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  background-color: #282c34;
 }
 
 .App-header {
@@ -13,3 +14,11 @@
   color: white;
 }
 
+.Table {
+  background-color: burlywood;
+}
+
+.instructions {
+  text-align: left;
+  color: lavender;
+}
