@@ -1,19 +1,34 @@
-import React, { useRef, useState } from 'react';
+import { computeHeadingLevel } from '@testing-library/react';
+import React, { useRef, useState, FC, InputHTMLAttributes } from 'react';
 import './App.css';
 import robotSprite from './robotSprite.png'
+import useInterval from './useInterval';
 
 const tableX = 500
 const tableY = 500
-const robotStart = [0,0]
+const robotStart = [[0],[0]]
 const scale = 5
 
 function App() {
   const tableRef = useRef(null)
   const [robot, setRobot] = useState(robotStart)
-  const [direction, setDirection] = useState(0)
+  const [direction, setDirection] = useState([0, -1])
   const [safe, setSafe] = useState(true)
 
+  useInterval(() => runRobot(), 10)
 
+  function checkCliff(destination: number[]) {
+
+  }
+
+  function runRobot() {
+    const newRobot = [...robot]
+    const newRobotHead = [newRobot[0][0] + direction[0]]
+    newRobot.unshift(newRobotHead)
+    if (checkCliff(newRobotHead)) {
+      setSafe(false)
+    }
+  }
 
   return(
     <div className="App">
@@ -27,14 +42,17 @@ function App() {
           <li>REPORT - announce the X,Y,F position of the robot</li>
         </ul>
       </div>
-      <form>
-
-        <button onClick={''} className="runButton">Run</button>
-      </form>
-      
-      <img src={robotSprite} alt="Robot Sprite" width="80"></img>
-      <canvas className="Table" ref={tableRef} width={`${tableX}px`} height={`${tableY}px`} />
-      
+      <div>
+        <form>
+          <input type="text" placeholder="Type command here" />
+          <button type='submit'>Run</button>
+        </form>
+      </div>
+      <div onEvent={(e) => move(e)}>
+        <img src={robotSprite} alt="Robot Sprite" width="80"></img>
+        <canvas className="Table" ref={tableRef} width={`${tableX}px`} height={`${tableY}px`} />
+        {!safe && <div className="tableWarning">I don't want to go off the edge!</div>}
+      </div>
     </div>
   )
   
