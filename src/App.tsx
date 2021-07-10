@@ -56,9 +56,18 @@ class App extends React.Component<{}, IState, Robot>{
   
   handleSubmit(e: any): void {
     e.preventDefault();
-    // if (this.state.currentCommand === Robot.this.exceptedCommands )
-
-    
+    if (this.state.currentCommand === "MOVE") {
+      // Robot.move()
+      console.log("MOVE")
+    } else if (this.state.currentCommand === "LEFT") {
+      console.log("LEFT")
+    } else if (this.state.currentCommand === "RIGHT"){
+      console.log("RIGHT")
+    } else if (this.state.currentCommand === "REPORT"){
+      console.log("REPORT")
+    } else {
+      return this.incorrectInput()
+    }
     this.setState({
       currentCommand: (""),
       
@@ -68,7 +77,7 @@ class App extends React.Component<{}, IState, Robot>{
       ]
       
     })
-    console.log(this.state.currentCommand)
+    // console.log(this.state.currentCommand)
   }
 
   interpretInput(){
@@ -88,8 +97,9 @@ class App extends React.Component<{}, IState, Robot>{
   }
 
   incorrectInput() {
-    return "I don't know that one"
+    console.log("I don't know that one")
   }
+  
 
   render(): JSX.Element {
     // console.log(this.state)
@@ -106,6 +116,7 @@ class App extends React.Component<{}, IState, Robot>{
           </ul>
         </div>
         <div className="command">
+          {}
           <form onSubmit={(e) => {
             this.handleSubmit(e)
             }}>
