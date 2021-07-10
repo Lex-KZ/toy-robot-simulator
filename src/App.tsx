@@ -1,44 +1,82 @@
 import { computeHeadingLevel } from '@testing-library/react';
-import React, { useRef, useState, FC, InputHTMLAttributes } from 'react';
+import React from 'react';
 import { Interface } from 'readline';
 import './App.css';
-import robotSprite from './robotSprite.png'
-import useInterval from './useInterval';
 
-    const tableX = 500
-    const tableY = 500
-    // const robotStart = 
-    const scale = 5
+class Robot extends React.Component {
+  constructor(props: {}) {
+    super(props);
+    // const exceptedCommands: Array<string> = ["MOVE", "LEFT", "RIGHT", "REPORT"];
+    this.state = {
+      position: [0, 0],
+      expectedCommands: ["MOVE", "LEFT", "RIGHT", "REPORT"],
+      direction: "North"
+    }
+  }
+
+  move() {
+    console.log("MOVE")
+  }
+
+  left() {
+    console.log("LEFT")
+  }
+
+  right() {
+    console.log("RIGHT")
+  }
+
+  report() {
+    console.log("REPORT")
+  }
+
+  place() {
+    console.log("PLACE")
+  }
+}
 
 
-class App extends React.Component<{}, IState>{
+class App extends React.Component<{}, IState, Robot>{
+  
+  limit = [0, 4];
 
   constructor(props: {}) {
     super(props);
 
     this.state = {
-      // tableRef: null,
-      robot: [[0],[0]],
-      direction: [0, -1],
-      safe: true,
-      currentDirection: "",
-      currentPlace: {X: 0, Y: 0, F: "North"},
+      
       currentCommand: "",
-      commands: [],
-      com: ""
+      commands: []
+      
     }
   }
 
+  
+
+  
   handleSubmit(e: any): void {
     e.preventDefault();
+    // if (this.state.currentCommand === Robot.this.exceptedCommands )
+
+    
     this.setState({
-      currentCommand: "",
-      com: this.state.currentCommand,
+      currentCommand: (""),
+      
       commands: [
-        ...this.state.commands,
-        this.state.currentCommand.toUpperCase()
+        this.state.currentCommand.toUpperCase(),
+        ...this.state.commands
       ]
+      
     })
+    console.log(this.state.currentCommand)
+  }
+
+  interpretInput(){
+    console.log("input")
+  }
+
+  translateInput(){
+    console.log("command")
   }
 
   renderCommands(): JSX.Element[] {
@@ -49,44 +87,12 @@ class App extends React.Component<{}, IState>{
     });
   }
 
-  robotAction() {
-    // if (this.state.com = "PLACE"){
-    //   console.log("PLACE")
-    // } else {
-    //   switch(this.state.com) {
-    //     case "MOVE":
-    //       console.log("MOVE")
-    //       break
-    //     case "LEFT":
-    //       console.log("LEFT")
-    //       break
-    //     case "RIGHT":
-    //       console.log("RIGHT")
-    //       break
-    //     case "REPORT":
-    //       console.log("REPORT")
-    //       break
-    //     default:
-    //       return "I don't know that one"
-    //   }
-    // }
+  incorrectInput() {
+    return "I don't know that one"
   }
-
-  checkCliff(destination: number[]) {
-    
-  }
-
-  // runRobot() {
-  //   const newRobot = this.robot
-  //   const newRobotHead = [newRobot[0][0] + this.direction[0]]
-  //   newRobot.unshift(newRobotHead)
-  //   // if (checkCliff(newRobotHead)) {
-  //   //   setSafe(false)
-  //   // }
-  // }
 
   render(): JSX.Element {
-    console.log(this.state)
+    // console.log(this.state)
     return(
       <div className="App">
         <div className="instructions">
@@ -100,26 +106,22 @@ class App extends React.Component<{}, IState>{
           </ul>
         </div>
         <div className="command">
-          <form onSubmit={(e) => this.handleSubmit(e)}>
+          <form onSubmit={(e) => {
+            this.handleSubmit(e)
+            }}>
             <input 
             type="text" 
             placeholder="Type command here" 
             value={this.state.currentCommand.toUpperCase()}
             onChange={
-              e => this.setState({ currentCommand: e.target.value })
+              e => this.setState({ currentCommand: e.target.value.toUpperCase() })
             }/>
             <button type='submit'>Run</button>
           </form>
         </div>
         <section>
           {this.renderCommands()} 
-          {this.robotAction()}
         </section>
-        {/* <div onEvent={(e) => move(e)}>
-          <img src={robotSprite} alt="Robot Sprite" width="80"></img>
-          <canvas className="Table"  width={`${tableX}px`} height={`${tableY}px`} />
-          {!this.safe && <div className="tableWarning">I don't want to go off the edge!</div>}
-        </div> */}
       </div>
     )
   }
@@ -127,16 +129,14 @@ class App extends React.Component<{}, IState>{
 }
 
 interface IState {
-  robot: Array<[number]>;
-  direction: Array<number>;
-  safe: boolean;
-  currentDirection: string;
-  currentPlace: {};
+  // direction: Array<number>;
+  // safe: boolean;
+  // currentDirection: string;
+  // currentPlace: {};
   currentCommand: string;
   commands: Array<string>;
-  com: string;
+  // com: string;
+  // table: Array<Array<null>>
 }
 
-
-// ref={tableRef}
 export default App;
