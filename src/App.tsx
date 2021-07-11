@@ -3,13 +3,32 @@ import React from 'react';
 import { Interface } from 'readline';
 import './App.css';
 
+
+class Table {
+  private leftLimit: number
+  private rightLimit: number
+  private upperLimit: number
+  private lowerLimit: number
+
+  constructor() {
+    this.leftLimit = 0
+    this.rightLimit = 4
+    this.upperLimit = 4
+    this.lowerLimit = 0
+  }
+
+  isEdge() {
+    console.log("edge")
+  }
+}
+
 class Robot {
   private position: number[]
   private direction: string
 
   constructor() {
     this.position = [0, 0]
-    this.direction = "North"
+    this.direction = "NORTH"
   }
 
   public executeCommand(command: string) {
@@ -18,20 +37,20 @@ class Robot {
     switch (command) {
       case "LEFT": {
         switch (this.direction) {
-          case "North": {
-            this.direction = "West"
+          case "NORTH": {
+            this.direction = "WEST"
             break
           }
-          case "East": {
-            this.direction = "North"
+          case "EAST": {
+            this.direction = "NORTH"
             break
           }
-          case "South": {
-            this.direction = "East"
+          case "SOUTH": {
+            this.direction = "EAST"
             break
           }
-          case "West": {
-            this.direction = "South"
+          case "WEST": {
+            this.direction = "SOUTH"
             break
           }
         }
@@ -39,20 +58,20 @@ class Robot {
       }
       case "RIGHT": {
         switch (this.direction) {
-          case "North": {
-            this.direction = "East"
+          case "NORTH": {
+            this.direction = "EAST"
             break
           }
-          case "East": {
-            this.direction = "South"
+          case "EAST": {
+            this.direction = "SOUTH"
             break
           }
-          case "South": {
-            this.direction = "West"
+          case "SOUTH": {
+            this.direction = "WEST"
             break
           }
-          case "West": {
-            this.direction = "North"
+          case "WEST": {
+            this.direction = "NORTH"
             break
           }
         }
@@ -60,19 +79,19 @@ class Robot {
       }
       case "MOVE": {
         switch (this.direction) {
-          case "North": { 
+          case "NORTH": { 
             this.position[1]++
             break
           }
-          case "East": {
+          case "EAST": {
             this.position[0]++
             break
           }
-          case "South": {
+          case "SOUTH": {
             this.position[1]--
             break
           }
-          case "West": {
+          case "WEST": {
             this.position[0]--
             break
           }
@@ -84,26 +103,50 @@ class Robot {
       }
     }
   }
+
+  executePlace(placeX: number, placeY: number, direction: string){
+    this.position[0] = placeX
+    this.position[1] = placeY
+    this.direction = direction
+  }
 }
 
 
 class App extends React.Component<{}, IState>{
   
-  limit = [0, 4];
-  
   constructor(props: {}) {
     super(props);
-    // const robot = new Robot({});
+
     this.state = {
       robot: new Robot(),
       currentCommand: "",
       commands: [],
-      command: ""
-      
+      currentDirection: "",
+      currentCoordinateX: 0,
+      currentCoordinateY: 0
     }
   }
 
-  
+  PlaceInputFields(currentCommand: string) {
+    if (currentCommand === "PLACE") {
+      return (
+        <div>
+          <label htmlFor="placeX">Coordinate X:</label>
+          <input type="number" name="placeX" min="0" max="4" value={this.state.currentCoordinateX} onChange={ 
+            e => this.setState({currentCoordinateX: parseInt(e.target.value)})
+          } required></input>
+          <label htmlFor="placeY">Coordinate Y:</label>
+          <input type="number" name="placeY" min="0" max="4" value={this.state.currentCoordinateY} onChange={ 
+            e => this.setState({currentCoordinateY: parseInt(e.target.value)})
+          }required></input>
+          <label htmlFor="directionF">Direction:</label>
+          <input type="text" name="directionF" value={this.state.currentDirection.toUpperCase()} onChange={
+            e => this.setState({currentDirection: e.target.value.toUpperCase()})
+          } required></input>
+        </div>
+      )
+    }
+  }
 
   handleSubmit(e: any): void {
     e.preventDefault();
@@ -115,7 +158,10 @@ class App extends React.Component<{}, IState>{
       this.state.robot.executeCommand(this.state.currentCommand)
     } else if (this.state.currentCommand === "REPORT"){
       this.state.robot.executeCommand(this.state.currentCommand)
-    } else {
+    } else if (this.state.currentCommand === "PLACE") {
+      console.log("PLACE")
+      this.state.robot.executePlace(this.state.currentCoordinateX, this.state.currentCoordinateY, this.state.currentDirection)
+    }else {
       return this.incorrectInput()
     }
     this.setState({
@@ -173,6 +219,9 @@ class App extends React.Component<{}, IState>{
             onChange={
               e => this.setState({ currentCommand: e.target.value.toUpperCase() })
             }/>
+            {
+              this.PlaceInputFields(this.state.currentCommand)
+            }
             <button type='submit'>Run</button>
           </form>
         </div>
@@ -189,7 +238,9 @@ interface IState {
   robot: Robot;
   currentCommand: string;
   commands: Array<string>;
-  command: string;
+  currentDirection: string;
+  currentCoordinateX: number;
+  currentCoordinateY: number;
 }
 
 export default App;
