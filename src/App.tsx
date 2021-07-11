@@ -4,36 +4,21 @@ import { Interface } from 'readline';
 import './App.css';
 
 
-class Table {
-  private leftLimit: number
-  private rightLimit: number
-  private upperLimit: number
-  private lowerLimit: number
-
-  constructor() {
-    this.leftLimit = 0
-    this.rightLimit = 4
-    this.upperLimit = 4
-    this.lowerLimit = 0
-  }
-
-  isEdge() {
-    console.log("edge")
-  }
-}
 
 class Robot {
-  private position: number[]
-  private direction: string
+  public position: number[]
+  public direction: string
+  public edge: boolean
+  public report: boolean
 
   constructor() {
     this.position = [0, 0]
     this.direction = "NORTH"
+    this.edge = false
+    this.report = false
   }
 
   public executeCommand(command: string) {
-    //to do: determine if safe
-    
     switch (command) {
       case "LEFT": {
         switch (this.direction) {
@@ -54,6 +39,8 @@ class Robot {
             break
           }
         }
+        this.edge = false
+        this.report = false
         break
       }
       case "RIGHT": {
@@ -75,33 +62,61 @@ class Robot {
             break
           }
         }
+        this.edge = false
+        this.report = false
         break
       }
       case "MOVE": {
         switch (this.direction) {
           case "NORTH": { 
-            this.position[1]++
+            if (this.position[1] < 4){
+              this.position[1]++
+              this.edge = false
+            } else {
+              this.edge = true
+            }
             break
           }
           case "EAST": {
-            this.position[0]++
+            if (this.position[0] < 4) {
+              this.position[0]++
+              this.edge = false
+            } else {
+              console.log("Not off the table please")
+            }
             break
           }
           case "SOUTH": {
-            this.position[1]--
+            if (this.position[1] > 0) {
+              this.position[1]--
+              this.edge = false
+            } else {
+              console.log("Not off the table please")
+            }
             break
           }
           case "WEST": {
-            this.position[0]--
+            if (this.position[0] > 0) {
+              this.position[0]--
+              this.edge = false
+            } else {
+              this.edge = true
+            }
             break
           }
         }
+        this.report = false
         break
       }
       case "REPORT": {
-        return console.log(`Output: Place ${this.position}, ${this.direction}`)
+        this.report = true
+        this.edge = false
       }
     }
+  }
+
+  executeReport(){
+    return <div>{`Output: Place ${this.position}, ${this.direction}`}</div>
   }
 
   executePlace(placeX: number, placeY: number, direction: string){
@@ -159,11 +174,11 @@ class App extends React.Component<{}, IState>{
     } else if (this.state.currentCommand === "REPORT"){
       this.state.robot.executeCommand(this.state.currentCommand)
     } else if (this.state.currentCommand === "PLACE") {
-      console.log("PLACE")
       this.state.robot.executePlace(this.state.currentCoordinateX, this.state.currentCoordinateY, this.state.currentDirection)
-    }else {
-      return this.incorrectInput()
+    } else {
+      
     }
+   
     this.setState({
       currentCommand: (""),
       commands: [
@@ -171,14 +186,6 @@ class App extends React.Component<{}, IState>{
         ...this.state.commands
       ]
     })
-  }
-
-  interpretInput(){
-    console.log("input")
-  }
-
-  translateInput(){
-    console.log("command")
   }
 
   renderCommands(): JSX.Element[] {
@@ -189,8 +196,27 @@ class App extends React.Component<{}, IState>{
     });
   }
 
-  incorrectInput() {
-    console.log("I don't know that one")
+  incorrectInput(error: boolean) {
+    if (error === true){
+      return(
+        <div>I don't know that one. Please type one of the above commands</div>
+      )
+    }
+    // error = false
+  }
+
+  edgeError(edge: boolean) {
+    if (edge === true) {
+      return(
+        <div>Not off the table please</div>
+      )
+    }
+  }
+
+  renderReport(report: boolean) {
+    if (report === true) {
+      return this.state.robot.executeReport()
+    }
   }
   
 
@@ -200,7 +226,7 @@ class App extends React.Component<{}, IState>{
         <div className="instructions">
           Please enter one of the following commands:
           <ul>
-            <li>PLACE X,Y,Z - where X,Y is a position on the table and F is a cardinal direction(North, South, East, West)</li>
+            <li>PLACE X,Y,Z - Please type PLACE then fill out the fields that appear. X,Y is a position on the table and F is a cardinal direction(North, South, East, West)</li>
             <li>MOVE - move forward the way it is facing</li>
             <li>LEFT - rotate 90 degrees anti-clockwise</li>
             <li>RIGHT - rotate 90 degrees clockwise</li>
@@ -208,7 +234,9 @@ class App extends React.Component<{}, IState>{
           </ul>
         </div>
         <div className="command">
-          {}
+          {
+            this.edgeError(this.state.robot.edge)
+          }
           <form onSubmit={(e) => {
             this.handleSubmit(e)
             }}>
@@ -226,6 +254,8 @@ class App extends React.Component<{}, IState>{
           </form>
         </div>
         <section>
+          {console.log(this.state.robot.report)}
+          {this.renderReport(this.state.robot.report)}
           {this.renderCommands()} 
         </section>
       </div>
