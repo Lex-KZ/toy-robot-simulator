@@ -10,12 +10,16 @@ class Robot {
   public direction: string
   public edge: boolean
   public report: boolean
+  public inputUnknown: boolean
+  public placed: boolean
 
   constructor() {
     this.position = [0, 0]
     this.direction = "NORTH"
     this.edge = false
     this.report = false
+    this.inputUnknown = false
+    this.placed = false
   }
 
   public executeCommand(command: string) {
@@ -39,8 +43,7 @@ class Robot {
             break
           }
         }
-        this.edge = false
-        this.report = false
+        this.reset()
         break
       }
       case "RIGHT": {
@@ -62,8 +65,7 @@ class Robot {
             break
           }
         }
-        this.edge = false
-        this.report = false
+        this.reset()
         break
       }
       case "MOVE": {
@@ -106,11 +108,13 @@ class Robot {
           }
         }
         this.report = false
+        this.inputUnknown = false
         break
       }
       case "REPORT": {
         this.report = true
         this.edge = false
+        this.inputUnknown = false
       }
     }
   }
@@ -124,6 +128,24 @@ class Robot {
     this.position[1] = placeY
     this.direction = direction
   }
+
+  unknownInput(){
+    this.inputUnknown = true
+    
+  }
+  
+  reset() {
+    this.edge = false
+    this.report = false
+    this.inputUnknown = false
+  }
+
+  placeFirst(command: string) {
+    if (command === "PLACE"){
+      this.placed = true
+    }
+  }
+
 }
 
 
@@ -165,19 +187,25 @@ class App extends React.Component<{}, IState>{
 
   handleSubmit(e: any): void {
     e.preventDefault();
-    if (this.state.currentCommand === "MOVE") {
-      this.state.robot.executeCommand(this.state.currentCommand)
-    } else if (this.state.currentCommand === "LEFT") {
-      this.state.robot.executeCommand(this.state.currentCommand)
-    } else if (this.state.currentCommand === "RIGHT"){
-      this.state.robot.executeCommand(this.state.currentCommand)
-    } else if (this.state.currentCommand === "REPORT"){
-      this.state.robot.executeCommand(this.state.currentCommand)
-    } else if (this.state.currentCommand === "PLACE") {
-      this.state.robot.executePlace(this.state.currentCoordinateX, this.state.currentCoordinateY, this.state.currentDirection)
+    this.state.robot.placeFirst(this.state.currentCommand)
+    if (this.state.robot.placed === true ) {
+      if (this.state.currentCommand === "MOVE") {
+        this.state.robot.executeCommand(this.state.currentCommand)
+      } else if (this.state.currentCommand === "LEFT") {
+        this.state.robot.executeCommand(this.state.currentCommand)
+      } else if (this.state.currentCommand === "RIGHT"){
+        this.state.robot.executeCommand(this.state.currentCommand)
+      } else if (this.state.currentCommand === "REPORT"){
+        this.state.robot.executeCommand(this.state.currentCommand)
+      } else if (this.state.currentCommand === "PLACE") {
+        this.state.robot.executePlace(this.state.currentCoordinateX, this.state.currentCoordinateY, this.state.currentDirection)
+      } else {
+        this.state.robot.unknownInput()
+      }
     } else {
-      
+
     }
+    
    
     this.setState({
       currentCommand: (""),
@@ -218,13 +246,21 @@ class App extends React.Component<{}, IState>{
       return this.state.robot.executeReport()
     }
   }
+
+  notPlaced(placed: boolean) {
+    if (placed === false){
+      return (
+        <div>Please use the PLACE command</div>
+      )
+    }
+  }
   
 
   render(): JSX.Element {
     return(
       <div className="App">
         <div className="instructions">
-          Please enter one of the following commands:
+          Please enter the following PLACE command, then one of the following commands:
           <ul>
             <li>PLACE X,Y,Z - Please type PLACE then fill out the fields that appear. X,Y is a position on the table and F is a cardinal direction(North, South, East, West)</li>
             <li>MOVE - move forward the way it is facing</li>
@@ -234,9 +270,11 @@ class App extends React.Component<{}, IState>{
           </ul>
         </div>
         <div className="command">
-          {
-            this.edgeError(this.state.robot.edge)
-          }
+          <section>
+            {this.edgeError(this.state.robot.edge)}
+            {this.incorrectInput(this.state.robot.inputUnknown)}
+            {this.notPlaced(this.state.robot.placed)}
+          </section>
           <form onSubmit={(e) => {
             this.handleSubmit(e)
             }}>
