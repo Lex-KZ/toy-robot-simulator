@@ -3,81 +3,128 @@ import React from 'react';
 import { Interface } from 'readline';
 import './App.css';
 
-class Robot extends React.Component {
-  constructor(props: {}) {
-    super(props);
-    // const exceptedCommands: Array<string> = ["MOVE", "LEFT", "RIGHT", "REPORT"];
-    this.state = {
-      position: [0, 0],
-      expectedCommands: ["MOVE", "LEFT", "RIGHT", "REPORT"],
-      direction: "North"
+class Robot {
+  private position: number[]
+  private direction: string
+
+  constructor() {
+    this.position = [0, 0]
+    this.direction = "North"
+  }
+
+  public executeCommand(command: string) {
+    //to do: determine if safe
+    
+    switch (command) {
+      case "LEFT": {
+        switch (this.direction) {
+          case "North": {
+            this.direction = "West"
+            break
+          }
+          case "East": {
+            this.direction = "North"
+            break
+          }
+          case "South": {
+            this.direction = "East"
+            break
+          }
+          case "West": {
+            this.direction = "South"
+            break
+          }
+        }
+        break
+      }
+      case "RIGHT": {
+        switch (this.direction) {
+          case "North": {
+            this.direction = "East"
+            break
+          }
+          case "East": {
+            this.direction = "South"
+            break
+          }
+          case "South": {
+            this.direction = "West"
+            break
+          }
+          case "West": {
+            this.direction = "North"
+            break
+          }
+        }
+        break
+      }
+      case "MOVE": {
+        switch (this.direction) {
+          case "North": { 
+            this.position[1]++
+            break
+          }
+          case "East": {
+            this.position[0]++
+            break
+          }
+          case "South": {
+            this.position[1]--
+            break
+          }
+          case "West": {
+            this.position[0]--
+            break
+          }
+        }
+        break
+      }
+      case "REPORT": {
+        return console.log(`Output: Place ${this.position}, ${this.direction}`)
+      }
     }
-  }
-
-  move() {
-    console.log("MOVE")
-  }
-
-  left() {
-    console.log("LEFT")
-  }
-
-  right() {
-    console.log("RIGHT")
-  }
-
-  report() {
-    console.log("REPORT")
-  }
-
-  place() {
-    console.log("PLACE")
   }
 }
 
 
-class App extends React.Component<{}, IState, Robot>{
+class App extends React.Component<{}, IState>{
   
   limit = [0, 4];
-
+  
   constructor(props: {}) {
     super(props);
-
+    // const robot = new Robot({});
     this.state = {
-      
+      robot: new Robot(),
       currentCommand: "",
-      commands: []
+      commands: [],
+      command: ""
       
     }
   }
 
   
 
-  
   handleSubmit(e: any): void {
     e.preventDefault();
     if (this.state.currentCommand === "MOVE") {
-      // Robot.move()
-      console.log("MOVE")
+      this.state.robot.executeCommand(this.state.currentCommand)
     } else if (this.state.currentCommand === "LEFT") {
-      console.log("LEFT")
+      this.state.robot.executeCommand(this.state.currentCommand)
     } else if (this.state.currentCommand === "RIGHT"){
-      console.log("RIGHT")
+      this.state.robot.executeCommand(this.state.currentCommand)
     } else if (this.state.currentCommand === "REPORT"){
-      console.log("REPORT")
+      this.state.robot.executeCommand(this.state.currentCommand)
     } else {
       return this.incorrectInput()
     }
     this.setState({
       currentCommand: (""),
-      
       commands: [
         this.state.currentCommand.toUpperCase(),
         ...this.state.commands
       ]
-      
     })
-    // console.log(this.state.currentCommand)
   }
 
   interpretInput(){
@@ -102,7 +149,6 @@ class App extends React.Component<{}, IState, Robot>{
   
 
   render(): JSX.Element {
-    // console.log(this.state)
     return(
       <div className="App">
         <div className="instructions">
@@ -140,14 +186,10 @@ class App extends React.Component<{}, IState, Robot>{
 }
 
 interface IState {
-  // direction: Array<number>;
-  // safe: boolean;
-  // currentDirection: string;
-  // currentPlace: {};
+  robot: Robot;
   currentCommand: string;
   commands: Array<string>;
-  // com: string;
-  // table: Array<Array<null>>
+  command: string;
 }
 
 export default App;
