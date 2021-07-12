@@ -2,151 +2,8 @@ import { computeHeadingLevel } from '@testing-library/react';
 import React from 'react';
 import { Interface } from 'readline';
 import './App.css';
+import { Robot } from './Robot';
 
-
-
-class Robot {
-  public position: number[]
-  public direction: string
-  public edge: boolean
-  public report: boolean
-  public inputUnknown: boolean
-  public placed: boolean
-
-  constructor() {
-    this.position = [0, 0]
-    this.direction = "NORTH"
-    this.edge = false
-    this.report = false
-    this.inputUnknown = false
-    this.placed = false
-  }
-
-  public executeCommand(command: string) {
-    switch (command) {
-      case "LEFT": {
-        switch (this.direction) {
-          case "NORTH": {
-            this.direction = "WEST"
-            break
-          }
-          case "EAST": {
-            this.direction = "NORTH"
-            break
-          }
-          case "SOUTH": {
-            this.direction = "EAST"
-            break
-          }
-          case "WEST": {
-            this.direction = "SOUTH"
-            break
-          }
-        }
-        this.reset()
-        break
-      }
-      case "RIGHT": {
-        switch (this.direction) {
-          case "NORTH": {
-            this.direction = "EAST"
-            break
-          }
-          case "EAST": {
-            this.direction = "SOUTH"
-            break
-          }
-          case "SOUTH": {
-            this.direction = "WEST"
-            break
-          }
-          case "WEST": {
-            this.direction = "NORTH"
-            break
-          }
-        }
-        this.reset()
-        break
-      }
-      case "MOVE": {
-        switch (this.direction) {
-          case "NORTH": { 
-            if (this.position[1] < 4){
-              this.position[1]++
-              this.edge = false
-            } else {
-              this.edge = true
-            }
-            break
-          }
-          case "EAST": {
-            if (this.position[0] < 4) {
-              this.position[0]++
-              this.edge = false
-            } else {
-              console.log("Not off the table please")
-            }
-            break
-          }
-          case "SOUTH": {
-            if (this.position[1] > 0) {
-              this.position[1]--
-              this.edge = false
-            } else {
-              console.log("Not off the table please")
-            }
-            break
-          }
-          case "WEST": {
-            if (this.position[0] > 0) {
-              this.position[0]--
-              this.edge = false
-            } else {
-              this.edge = true
-            }
-            break
-          }
-        }
-        this.report = false
-        this.inputUnknown = false
-        break
-      }
-      case "REPORT": {
-        this.report = true
-        this.edge = false
-        this.inputUnknown = false
-      }
-    }
-  }
-
-  executeReport(){
-    return <div>{`Output: Place ${this.position}, ${this.direction}`}</div>
-  }
-
-  executePlace(placeX: number, placeY: number, direction: string){
-    this.position[0] = placeX
-    this.position[1] = placeY
-    this.direction = direction
-  }
-
-  unknownInput(){
-    this.inputUnknown = true
-    
-  }
-  
-  reset() {
-    this.edge = false
-    this.report = false
-    this.inputUnknown = false
-  }
-
-  placeFirst(command: string) {
-    if (command === "PLACE"){
-      this.placed = true
-    }
-  }
-
-}
 
 
 class App extends React.Component<{}, IState>{
@@ -230,7 +87,6 @@ class App extends React.Component<{}, IState>{
         <div>I don't know that one. Please type one of the above commands</div>
       )
     }
-    // error = false
   }
 
   edgeError(edge: boolean) {
@@ -259,7 +115,7 @@ class App extends React.Component<{}, IState>{
   render(): JSX.Element {
     return(
       <div className="App">
-        <div className="instructions">
+        <div className="instructions" data-testid="instructions">
           Please enter the following PLACE command, then one of the following commands:
           <ul>
             <li>PLACE X,Y,Z - Please type PLACE then fill out the fields that appear. X,Y is a position on the table and F is a cardinal direction(North, South, East, West)</li>
@@ -278,21 +134,24 @@ class App extends React.Component<{}, IState>{
           <form onSubmit={(e) => {
             this.handleSubmit(e)
             }}>
-            <input 
+            
+            <input
+            data-testid="command-input" 
             type="text" 
             placeholder="Type command here" 
             value={this.state.currentCommand.toUpperCase()}
             onChange={
               e => this.setState({ currentCommand: e.target.value.toUpperCase() })
             }/>
+            <div data-testid="place-input">
             {
               this.PlaceInputFields(this.state.currentCommand)
             }
+            </div>
             <button type='submit'>Run</button>
           </form>
         </div>
         <section>
-          {console.log(this.state.robot.report)}
           {this.renderReport(this.state.robot.report)}
           {this.renderCommands()} 
         </section>
