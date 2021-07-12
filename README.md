@@ -34,7 +34,7 @@ $ git --version
 
 Clone the project repository:
 ~~~
-$ git clone
+$ git clone https://github.com/Lex-KZ/toy-robot-simulator.git
 ~~~
 
 Move into the project directory and install npm package:
