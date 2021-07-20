@@ -97,6 +97,14 @@ class App extends React.Component<{}, IState>{
     }
   }
 
+  obstacleError(obstacle: boolean) {
+    if (obstacle === true) {
+      return(
+        <div>Pothole!</div>
+      )
+    }
+  }
+
   renderReport(report: boolean) {
     if (report === true) {
       return this.state.robot.executeReport()
@@ -127,6 +135,7 @@ class App extends React.Component<{}, IState>{
         </div>
         <div className="command">
           <section>
+            {this.obstacleError(this.state.robot.obstacle)}
             {this.edgeError(this.state.robot.edge)}
             {this.incorrectInput(this.state.robot.inputUnknown)}
             {this.notPlaced(this.state.robot.placed)}

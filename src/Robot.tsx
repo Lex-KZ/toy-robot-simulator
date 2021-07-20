@@ -10,6 +10,7 @@ export class Robot {
   public report: boolean;
   public inputUnknown: boolean;
   public placed: boolean;
+  public obstacle: boolean;
 
   constructor() {
     this.position = [0, 0];
@@ -18,6 +19,7 @@ export class Robot {
     this.report = false;
     this.inputUnknown = false;
     this.placed = false;
+    this.obstacle = false;
   }
 
   public executeCommand(command: string) {
@@ -69,16 +71,22 @@ export class Robot {
       case "MOVE": {
         switch (this.direction) {
           case "NORTH": {
-            if (this.position[1] < 4) {
+            if (this.position[1]+1 === 2){
+              this.obstacle = true;
+            } else if (this.position[1] < 4) {
               this.position[1]++;
               this.edge = false;
+              this.obstacle = false;
             } else {
               this.edge = true;
+              this.obstacle = false;
             }
             break;
           }
           case "EAST": {
-            if (this.position[0] < 4) {
+            if (this.position[0]+1 === 2){
+              this.obstacle = true;
+            } else if (this.position[0] < 4) {
               this.position[0]++;
               this.edge = false;
             } else {
@@ -87,7 +95,9 @@ export class Robot {
             break;
           }
           case "SOUTH": {
-            if (this.position[1] > 0) {
+            if (this.position[1]-1 === 2){
+              this.obstacle = true;
+            } else if(this.position[1] > 0) {
               this.position[1]--;
               this.edge = false;
             } else {
@@ -96,7 +106,9 @@ export class Robot {
             break;
           }
           case "WEST": {
-            if (this.position[0] > 0) {
+            if (this.position[0]-1 === 2){
+              this.obstacle = true;
+            } else if(this.position[0] > 0) {
               this.position[0]--;
               this.edge = false;
             } else {
@@ -113,6 +125,7 @@ export class Robot {
         this.report = true;
         this.edge = false;
         this.inputUnknown = false;
+        this.obstacle = false;
       }
     }
   }
